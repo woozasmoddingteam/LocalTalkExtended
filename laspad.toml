@@ -1,0 +1,6 @@
+[master]
+name            = "Local Talk Extended"
+tags            = ["Must be run on Server", "Gameplay Modification"]
+autodescription = true
+description     = "README.md"
+preview         = "preview.jpg"

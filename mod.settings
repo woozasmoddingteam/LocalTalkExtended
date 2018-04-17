@@ -1,9 +1,0 @@
-name        = "Local Talk Extended"
-source_dir  = "source"
-output_dir  = "output"
-description = [=[Local Talk Extended allows both normal local voice chat and team-only local voice chat!
-It is also much more compatible with other mods, and will likely cause less problems.]=]
-image       = "preview.jpg"
-tag_modtype = "Gameplay Tweak"
-tag_support = "Must be run on Server"
-publish_id = "3462371a"

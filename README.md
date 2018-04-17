@@ -17,6 +17,9 @@ One allows everyone to hear you, the other is only for your own team.
 As noted above, there are two key binds.
 You must manually set either or both of these key binds.
 
+The key bindings are prefixed with "Proximity Communication" and are
+at the very bottom, so you have to scroll quite a lot!
+
 # Compared to competitors
 
 Compared to competitors this mod is more compatible with other mods,

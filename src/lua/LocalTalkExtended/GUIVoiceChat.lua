@@ -17,13 +17,13 @@ function GUIVoiceChat:SendKeyEvent(key, down, amount)
 			self.recordBind    = "LocalVoiceChat"
 			self.recordEndTime = nil
 
-			Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = true}, true)
+			Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = false}, true)
 			Client.VoiceRecordStartEntity(player, Vector.origin)
 		elseif GetIsBinding(key, "LocalVoiceChatTeam") then
 			self.recordBind    = "LocalVoiceChatTeam"
 			self.recordEndTime = nil
 
-			Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = false}, true)
+			Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = true}, true)
 			Client.VoiceRecordStartEntity(player, Vector.origin)
 		end
 	elseif self.recordBind and GetIsBinding(key, self.recordBind) then

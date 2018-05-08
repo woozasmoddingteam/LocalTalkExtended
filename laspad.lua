@@ -2,7 +2,7 @@ return {
 	master = {
 		name            = "Local Talk Extended",
 		tags            = {"must be run on server", "gameplay tweak"},
-		description     = laspad.get_description("README.md"),
+		description     = laspad.get_description("README.md", true, "https://github.com/woozasmoddingteam/LocalTalkExtended"),
 		preview         = laspad.read("preview.jpg"),
 	},
 	beta = {

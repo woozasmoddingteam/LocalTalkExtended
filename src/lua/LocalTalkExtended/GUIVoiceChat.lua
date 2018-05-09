@@ -1,3 +1,4 @@
+local kLocalVoiceFontColor = Color(0.5, 0.5, 0.5, 1)
 local ClearAllBars
 local GetFreeBar
 local kBackgroundOffset
@@ -64,6 +65,7 @@ function(self, delta_time)
 			local team = player.EntityTeamNumber
 
 			local color =
+				channel ~= VoiceChannel.Global and kLocalVoiceFontColor or
 				player.IsCommander and GUIVoiceChat.kCommanderFontColor or
 				team == 1 and GUIVoiceChat.kMarineFontColor or
 				team == 2 and GUIVoiceChat.kAlienFontColor or

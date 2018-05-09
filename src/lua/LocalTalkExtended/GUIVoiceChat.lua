@@ -1,4 +1,6 @@
-local kLocalVoiceFontColor = Color(0.5, 0.5, 0.5, 1)
+local kLocalVoiceFontColor         = Color(0.50, 1.00, 0.50, 1)
+local kLocalVoiceTeamOnlyFontColor = Color(0.75, 0.10, 0.75, 1)
+
 local ClearAllBars
 local GetFreeBar
 local kBackgroundOffset
@@ -7,6 +9,13 @@ local kBackgroundSize
 local kBackgroundTexture
 local kVoiceChatIconOffset
 
+local voice_teamonly = table.array(100)
+
+Client.HookNetworkMessage("LocalTalkExtended_teamonly_notify", function(msg)
+	voice_teamonly[msg.client] = msg.on
+end)
+
+local team_only
 debug.replacemethod("GUIVoiceChat", "SendKeyEvent",
 function(self, key, down, amount)
 	local player = Client.GetLocalPlayer()
@@ -24,13 +33,19 @@ function(self, key, down, amount)
 			self.recordBind    = "LocalVoiceChat"
 			self.recordEndTime = nil
 
-			Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = false}, true)
+			if team_only ~= false then
+				team_only = false
+				Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = false}, true)
+			end
 			Client.VoiceRecordStartEntity(player, Vector.origin)
 		elseif GetIsBinding(key, "LocalVoiceChatTeam") then
 			self.recordBind    = "LocalVoiceChatTeam"
 			self.recordEndTime = nil
 
-			Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = true}, true)
+			if team_only ~= true then
+				team_only = true
+				Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = true}, true)
+			end
 			Client.VoiceRecordStartEntity(player, Vector.origin)
 		end
 	elseif self.recordBind and GetIsBinding(key, self.recordBind) then
@@ -51,13 +66,15 @@ function(self, delta_time)
 	ClearAllBars(self)
 
 	local players = ScoreboardUI_GetAllScores()
+	local local_team = Client.GetLocalPlayer():GetTeamNumber()
+	local local_client = Client.GetLocalClientIndex()
 	local bar_position = Vector(kBackgroundOffset)
 
 	for i = 1, #players do
 		local player = players[i]
 
-		local client_index = player.ClientIndex
-		local channel = client_index and ChatUI_GetVoiceChannelForClient(client_index) or VoiceChannel.Invalid
+		local client = player.ClientIndex
+		local channel = client and ChatUI_GetVoiceChannelForClient(client) or VoiceChannel.Invalid
 
 		if channel ~= VoiceChannel.Invalid then
 			local bar = GetFreeBar(self)
@@ -65,7 +82,12 @@ function(self, delta_time)
 			local team = player.EntityTeamNumber
 
 			local color =
-				channel ~= VoiceChannel.Global and kLocalVoiceFontColor or
+				channel ~= VoiceChannel.Global and (
+					team == local_team and (
+						client == local_client and team_only or voice_teamonly[client]
+					) and kLocalVoiceTeamOnlyFontColor or
+					kLocalVoiceFontColor
+				) or
 				player.IsCommander and GUIVoiceChat.kCommanderFontColor or
 				team == 1 and GUIVoiceChat.kMarineFontColor or
 				team == 2 and GUIVoiceChat.kAlienFontColor or

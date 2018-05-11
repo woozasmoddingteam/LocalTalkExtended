@@ -96,6 +96,8 @@ function(self, delta_time)
 			bar.Name:SetText(player.Name)
 			bar.Name:SetColor(color)
 
+			bar.Icon:SetColor(color)
+
 			bar.Background:SetTexture(string.format(kBackgroundTexture, team == 2 and "alien" or "marine"))
 			bar.Background:SetColor(team ~= 1 and team ~= 2 and Color(1, 200/255, 150/255, 1) or Color(1, 1, 1, 1))
 			bar.Background:SetLayer(kGUILayerDeathScreen+1)
@@ -105,34 +107,4 @@ function(self, delta_time)
 			bar_position.y = bar_position.y + kBackgroundSize.y + kBackgroundYSpace
 		end
 	end
-end)
-
-debug.replaceupvalue(debug.getupvaluex(GUIVoiceChat.Update, "GetFreeBar"), "CreateChatBar",
-function()
-	local background = GUIManager:CreateGraphicItem()
-	background:SetSize(kBackgroundSize)
-	background:SetAnchor(GUIItem.Right, GUIItem.Center)
-	background:SetPosition(kBackgroundOffset)
-	background:SetIsVisible(false)
-
-	local name = GUIManager:CreateTextItem()
-	name:SetFontName(Fonts.kAgencyFB_Small)
-	name:SetAnchor(GUIItem.Right, GUIItem.Center)
-	name:SetScale(GetScaledVector())
-	name:SetTextAlignmentX(GUIItem.Align_Max)
-	name:SetTextAlignmentY(GUIItem.Align_Center)
-	name:SetPosition(Vector(-GUIScale(30), 0, 0))
-	GUIMakeFontScale(name)
-	background:AddChild(name)
-
-	return {Background = background, Name = name}
-end)
-
-debug.replaceupvalue(GUIVoiceChat.Uninitialize, "DestroyChatBar",
-function(bar)
-	GUI.DestroyItem(bar.Name)
-	bar.Name = nil
-
-	GUI.DestroyItem(bar.Background)
-	bar.Background = nil
 end)

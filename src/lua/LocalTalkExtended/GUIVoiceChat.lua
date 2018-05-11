@@ -6,8 +6,14 @@ local GetFreeBar
 local kBackgroundOffset
 local kBackgroundYSpace
 local kBackgroundSize
-local kBackgroundTexture
-local kVoiceChatIconOffset
+
+local kBackgroundTextureMarine
+local kBackgroundTextureAlien
+do
+	local kBackgroundTexture = debug.getupvaluex(GUIVoiceChat.Update, "kBackgroundTexture")
+	kBackgroundTextureMarine = string.format(kBackgroundTexture, "marine")
+	kBackgroundTextureAlien  = string.format(kBackgroundTexture, "alien")
+end
 
 local voice_teamonly = table.array(100)
 
@@ -98,7 +104,7 @@ function(self, delta_time)
 
 			bar.Icon:SetColor(color)
 
-			bar.Background:SetTexture(string.format(kBackgroundTexture, team == 2 and "alien" or "marine"))
+			bar.Background:SetTexture(team == 2 and kBackgroundTextureAlien or kBackgroundTextureMarine)
 			bar.Background:SetColor(team ~= 1 and team ~= 2 and Color(1, 200/255, 150/255, 1) or Color(1, 1, 1, 1))
 			bar.Background:SetLayer(kGUILayerDeathScreen+1)
 			bar.Background:SetIsVisible(self.visible)

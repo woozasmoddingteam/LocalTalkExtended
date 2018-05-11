@@ -1,5 +1,5 @@
-local kLocalVoiceFontColor         = Color(0.50, 1.00, 0.50, 1)
-local kLocalVoiceTeamOnlyFontColor = Color(0.75, 0.10, 0.75, 1)
+kLocalVoiceFontColor         = kLocalVoiceFontColor         or Color(0.50, 1.00, 0.50, 1)
+kLocalVoiceTeamOnlyFontColor = kLocalVoiceTeamOnlyFontColor or Color(0.75, 0.15, 0.75, 1)
 
 local ClearAllBars
 local GetFreeBar
@@ -91,8 +91,7 @@ function(self, delta_time)
 				channel ~= VoiceChannel.Global and (
 					team == local_team and (
 						client == local_client and team_only or voice_teamonly[client]
-					) and kLocalVoiceTeamOnlyFontColor or
-					kLocalVoiceFontColor
+					) and kLocalVoiceTeamOnlyFontColor or kLocalVoiceFontColor
 				) or
 				player.IsCommander and GUIVoiceChat.kCommanderFontColor or
 				team == 1 and GUIVoiceChat.kMarineFontColor or

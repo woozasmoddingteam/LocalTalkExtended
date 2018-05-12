@@ -55,6 +55,8 @@ function GUIVoiceChat:Initialize()
 		GUIMakeFontScale(name)
 		icon:AddChild(name)
 
+		bar_position.y = bar_position.y + kBackgroundYSpace + kBackgroundSize.y
+
 		chat_bars[i] = {background = background, icon = icon, name = name}
 	end
 end

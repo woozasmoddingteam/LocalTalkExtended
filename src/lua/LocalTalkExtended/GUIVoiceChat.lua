@@ -96,8 +96,6 @@ local function ResetBarForPlayerRecord(player)
 	player.VoiceChannel = nil
 	bar.player = nil
 	bar.background:SetIsVisible(false)
-
-	Log("Reset bar for player %s", player.ClientIndex)
 end
 
 local function ResetBarForClient(client)
@@ -212,8 +210,9 @@ function GUIVoiceChat:Update(delta_time)
 			if create_bar then
 				local bar
 				for i = 1, #chat_bars do
-					if not chat_bars[i].client then
+					if not chat_bars[i].player then
 						bar = chat_bars[i]
+						break
 					end
 				end
 				-- All bars may be occupied

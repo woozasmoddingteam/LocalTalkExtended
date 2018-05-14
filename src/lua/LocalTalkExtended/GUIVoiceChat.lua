@@ -15,6 +15,38 @@ local kGlobalSpeakerIcon = PrecacheAsset("ui/speaker.dds")
 
 local chat_bars
 
+local function ResetBarForPlayer(pie)
+	local bar = pie.voice_chat_bar
+	if not bar then return end
+
+	pie.voice_chat_bar = nil
+	pie.voice_channel  = nil
+	bar.player = Entity.invalidId
+	bar.background:SetIsVisible(false)
+end
+
+local function ResetBarForClient(client)
+	for _, pie in ientitylist(Shared.GetEntitiesWithClassname "PlayerInfoEntity") do
+		if pie.clientId == client then
+			return ResetBarForPlayer(pie)
+		end
+	end
+end
+
+local function IsRelevant(pie)
+	return Shared.GetEntity(pie.playerId) ~= nil
+end
+
+local function GetVoiceChannel(client)
+	local channel
+	if Client.GetLocalClientIndex() == client then
+		channel = Client.GetVoiceChannelForRecording()
+	else
+		channel = Client.GetVoiceChannelForClient(client)
+	end
+	return channel or VoiceChannel.Invalid
+end
+
 function GUIVoiceChat:Initialize()
 	self.visible = true
 
@@ -57,7 +89,7 @@ function GUIVoiceChat:Initialize()
 
 		bar_position.y = bar_position.y + kBackgroundYSpace + kBackgroundSize.y
 
-		chat_bars[i] = {background = background, icon = icon, name = name}
+		chat_bars[i] = {background = background, icon = icon, name = name, player = Entity.invalidId}
 	end
 end
 
@@ -86,21 +118,6 @@ end
 function GUIVoiceChat:OnResolutionChanged()
 	self:Uninitialize()
 	self:Initialize()
-end
-
-local function ResetBarForPlayerRecord(player)
-	local bar = player.VoiceChatBar
-	if not bar then return end
-
-	player.VoiceChatBar = nil
-	player.VoiceChannel = nil
-	bar.player = nil
-	bar.background:SetIsVisible(false)
-end
-
-local function ResetBarForClient(client)
-	local player = Scoreboard_GetPlayerRecord(client)
-	return ResetBarForPlayerRecord(player)
 end
 
 local team_only
@@ -162,46 +179,53 @@ function GUIVoiceChat:Update(delta_time)
 		self.recordEndTime = nil
 	end
 
-	local players = ScoreboardUI_GetAllScores()
-	local local_team = Client.GetLocalPlayer():GetTeamNumber()
+	local local_team   = Client.GetLocalPlayer():GetTeamNumber()
 	local local_client = Client.GetLocalClientIndex()
 
 	for i = 1, #chat_bars do
 		local bar = chat_bars[i]
-		local player = bar.player
-		if player then
-			-- Can we call this for invalid clients?
-			local client  = player.ClientIndex
-			local channel = ChatUI_GetVoiceChannelForClient(client) or VoiceChannel.Invalid
-			if channel ~= player.VoiceChannel then
-				-- If the channel isn't the global one, i.e. if it's proximity,
-				-- we also need the network message to tell us what kind of
-				-- local voice chat it is, so we delay the bar here.
-				if channel ~= VoiceChannel.Global then
-					player.VoiceChatBarTime = nil
+		local id = bar.player
+		if id ~= Entity.invalidId then
+			local pie = Shared.GetEntity(id)
+			if pie then
+				local channel = GetVoiceChannel(pie.clientId)
+				if channel ~= pie.voice_channel then
+					-- If the channel isn't the global one, i.e. if it's proximity,
+					-- we also need the network message to tell us what kind of
+					-- local voice chat it is, so we delay the bar here.
+					if channel ~= VoiceChannel.Global then
+						pie.voice_chat_bar_time = nil
+					end
+					ResetBarForPlayer(pie)
 				end
-				ResetBarForPlayerRecord(player)
+			else
+				bar.player = Entity.invalidId
+				bar.background:SetIsVisible(false)
 			end
 		end
 	end
 
-	for i = 1, #players do
-		local player = players[i]
-
-		local client  = player.ClientIndex
-		local channel = client and ChatUI_GetVoiceChannelForClient(client) or VoiceChannel.Invalid
+	for _, pie in ientitylist(Shared.GetEntitiesWithClassname "PlayerInfoEntity") do
+		local client  = pie.clientId
+		local channel = GetVoiceChannel(client)
 
 		-- Edge case bug:
 		-- If there are not any bars left, a player not speaking
-		-- will not have their VoiceChatBarTime set to nil
-		if channel ~= VoiceChannel.Invalid and not player.VoiceChatBar then
+		-- will not have their voice_chat_bar_time set to nil
+		--
+		-- Reasoning for IsRelevant (local function defined above) call:
+		-- Sadly Spark can not handle VoiceChannel.Entity when the entity referred to is not relevant
+		-- to the client.
+		-- This is understandable though, since the position is a part of the entity, so a fix
+		-- would be an architectural change, something too grand for a small bug like this.
+		if channel ~= VoiceChannel.Invalid and not pie.voice_chat_bar and IsRelevant(pie) then
 			local create_bar = true
 			if channel ~= VoiceChannel.Global and client ~= local_client then
 				-- We need to do this because the team-only network message
 				-- arrives after the voice transmission begins
-				local bar_time = player.VoiceChatBarTime
+				local bar_time = pie.voice_chat_bar_time
 				if not bar_time then
-					player.VoiceChatBarTime = time + 0.15
+					pie.voice_chat_bar_time = time + 0.15
 					create_bar = false
 				else
 					create_bar = bar_time <= time
@@ -210,14 +234,14 @@ function GUIVoiceChat:Update(delta_time)
 			if create_bar then
 				local bar
 				for i = 1, #chat_bars do
-					if not chat_bars[i].player then
+					if chat_bars[i].player == Entity.invalidId then
 						bar = chat_bars[i]
 						break
 					end
 				end
 				-- All bars may be occupied
 				if bar then
-					local team = player.EntityTeamNumber
+					local team = pie.teamNumber
 
 					local color =
 						channel ~= VoiceChannel.Global and (
@@ -225,12 +249,12 @@ function GUIVoiceChat:Update(delta_time)
 								client == local_client and team_only or voice_teamonly[client]
 							) and kLocalVoiceTeamOnlyFontColor or kLocalVoiceFontColor
 						) or
-						player.IsCommander and GUIVoiceChat.kCommanderFontColor or
+						pie.isCommander and GUIVoiceChat.kCommanderFontColor or
 						team == 1 and GUIVoiceChat.kMarineFontColor or
 						team == 2 and GUIVoiceChat.kAlienFontColor or
 						GUIVoiceChat.kSpectatorFontColor
 
-					bar.name:SetText(player.Name)
+					bar.name:SetText(pie.playerName)
 					bar.name:SetColor(color)
 
 					bar.icon:SetColor(color)
@@ -239,10 +263,10 @@ function GUIVoiceChat:Update(delta_time)
 					bar.background:SetColor(team ~= 1 and team ~= 2 and Color(1, 200/255, 150/255, 1) or Color(1, 1, 1, 1))
 					bar.background:SetIsVisible(self.visible)
 
-					player.VoiceChatBar = bar
-					bar.player = player
+					pie.voice_chat_bar = bar
+					bar.player = pie:GetId()
 
-					player.VoiceChannel = channel
+					pie.voice_channel = channel
 				end
 			end
 		end

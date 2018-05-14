@@ -21,6 +21,15 @@ if not Shine then
 	end)
 end
 
+local function GetActualOrigin(ent)
+	local followed = ent:isa "Spectator" and Shared.GetEntity(ent:GetFollowingPlayerId())
+	if followed then
+		return followed:GetOrigin()
+	else
+		return ent:GetOrigin()
+	end
+end
+
 -- Fuck you shine
 -- You're the reason I have to do this
 -- Why can't you just be a normal fucking
@@ -56,13 +65,15 @@ function Script.Load(path, reload)
 
 				local team_only = voice_teamonly[speaker_client:GetId()]
 
+				local distance = GetActualOrigin(listener):GetDistanceSquared(GetActualOrigin(speaker))
+
 				local hearable =
 					not DisableLocalAllTalkClients[listener_client] and
 					not DisableLocalAllTalkClients[speaker_client] and
 					(
 						team_only == false or
 						speaker_team == listener_team
-					) and listener:GetDistanceSquared(speaker) < kMaxWorldSoundDistanceSquared
+					) and distance < kMaxWorldSoundDistanceSquared
 
 				-- Need to update client's teamonly table
 				if hearable and speaker_team == listener_team then

@@ -75,7 +75,7 @@ function GUIVoiceChat:SetIsVisible(visible)
 	self.visible = visible
 
 	for i = 1, #chat_bars do
-		chat_bars[i]:SetIsVisible(visible)
+		chat_bars[i].background:SetIsVisible(visible)
 	end
 end
 

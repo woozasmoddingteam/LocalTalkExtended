@@ -63,7 +63,7 @@ function Script.Load(path, reload)
 				local speaker_team  = speaker:GetTeamNumber()
 				local listener_team = listener:GetTeamNumber()
 
-				local team_only = voice_teamonly[speaker_client:GetId()]
+				local team_only = voice_teamonly[speaker_client:GetId()] or false
 
 				local distance = GetActualOrigin(listener):GetDistanceSquared(GetActualOrigin(speaker))
 
@@ -78,7 +78,7 @@ function Script.Load(path, reload)
 				-- Need to update client's teamonly table
 				if hearable and speaker_team == listener_team then
 					voice_teamonly_for_client[listener_client] = voice_teamonly_for_client[listener_client] or {}
-					if voice_teamonly_for_client[listener_client][speaker_client] ~= team_only then
+					if (voice_teamonly_for_client[listener_client][speaker_client] or false) ~= team_only then
 						Server.SendNetworkMessage(
 							listener_client,
 							"LocalTalkExtended_teamonly_notify",

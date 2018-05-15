@@ -267,9 +267,11 @@ function GUIVoiceChat:Update(delta_time)
 
 					local color =
 						channel ~= VoiceChannel.Global and (
-							team == local_team and (
-								client == local_client and team_only or voice_teamonly[client]
-							) and kLocalVoiceTeamOnlyFontColor or kLocalVoiceFontColor
+							client == local_client and
+								(team_only and kLocalVoiceTeamOnlyFontColor or kLocalVoiceFontColor) or
+							(team == local_team or local_team == kSpectatorIndex) and voice_teamonly[client] and
+								kLocalVoiceTeamOnlyFontColor or
+							kLocalVoiceFontColor
 						) or
 						pie.isCommander and GUIVoiceChat.kCommanderFontColor or
 						team == 1 and GUIVoiceChat.kMarineFontColor or

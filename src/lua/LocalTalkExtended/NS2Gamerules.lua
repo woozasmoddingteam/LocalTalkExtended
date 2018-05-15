@@ -72,11 +72,12 @@ function Script.Load(path, reload)
 					not DisableLocalAllTalkClients[speaker_client] and
 					(
 						team_only == false or
-						speaker_team == listener_team
+						speaker_team == listener_team or
+						IsSpectatorAllTalk(self, listener)
 					) and distance < kMaxWorldSoundDistanceSquared
 
 				-- Need to update client's teamonly table
-				if hearable and speaker_team == listener_team then
+				if hearable and (speaker_team == listener_team or listener_team == kSpectatorIndex) then
 					voice_teamonly_for_client[listener_client] = voice_teamonly_for_client[listener_client] or {}
 					if (voice_teamonly_for_client[listener_client][speaker_client] or false) ~= team_only then
 						Server.SendNetworkMessage(

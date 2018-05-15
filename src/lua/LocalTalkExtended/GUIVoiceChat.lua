@@ -34,7 +34,14 @@ local function ResetBarForClient(client)
 end
 
 local function IsRelevant(pie)
-	return Shared.GetEntity(pie.playerId) ~= nil
+	return
+		Shared.GetEntity(pie.playerId) ~= nil or
+		-- Dead team mates can still be heard although irrelevant,
+		-- so we need to make an exception for them.
+		--
+		-- FIXME: When the person followed by a spectator is irrelevant
+		-- to our client, then the flickering voice chat bug will appear.
+		pie.isSpectator
 end
 
 local function GetVoiceChannel(client)
@@ -120,6 +127,12 @@ function GUIVoiceChat:OnResolutionChanged()
 	self:Initialize()
 end
 
+local function CanUseLocalVoiceChat(player)
+	return
+		player:GetTeamNumber() ~= kSpectatorIndex or
+		not GetGameInfoEntity():GetGameStarted() and player:GetIsFirstPerson()
+end
+
 local team_only
 function GUIVoiceChat:SendKeyEvent(key, down, amount)
 	local player = Client.GetLocalPlayer()
@@ -128,33 +141,42 @@ function GUIVoiceChat:SendKeyEvent(key, down, amount)
 	if down then
 		if ChatUI_EnteringChatMessage() then return end
 
-		local bind = player:isa "Commander" and "VoiceChatCom" or "VoiceChat"
+		local iscomm = player:isa "Commander"
+
+		local bind = iscomm and "VoiceChatCom" or "VoiceChat"
 		if GetIsBinding(key, bind) then
 			self.recordBind    = bind
 			self.recordEndTime = nil
 			ResetBarForClient(client)
 
 			Client.VoiceRecordStartGlobal()
-		elseif GetIsBinding(key, "LocalVoiceChat") then
-			self.recordBind    = "LocalVoiceChat"
-			self.recordEndTime = nil
-			ResetBarForClient(client)
+		elseif CanUseLocalVoiceChat(player) then
+			-- FIXME: Commanders can no talk to enemy players, even if sighted.
+			-- This is quite unfortunate, but unfortunately there is no
+			-- easy way to make enemy players hear them, and attempting
+			-- to remove this check will just result in a voice chat
+			-- bar flickering with no sound being emitted.
+			if not iscomm and GetIsBinding(key, "LocalVoiceChat") then
+				self.recordBind    = "LocalVoiceChat"
+				self.recordEndTime = nil
+				ResetBarForClient(client)
 
-			if team_only ~= false then
-				team_only = false
-				Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = false}, true)
-			end
-			Client.VoiceRecordStartEntity(player, Vector.origin)
-		elseif GetIsBinding(key, "LocalVoiceChatTeam") then
-			self.recordBind    = "LocalVoiceChatTeam"
-			self.recordEndTime = nil
-			ResetBarForClient(client)
+				if team_only ~= false then
+					team_only = false
+					Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = false}, true)
+				end
+				Client.VoiceRecordStartEntity(player, Vector.origin)
+			elseif GetIsBinding(key, "LocalVoiceChatTeam") then
+				self.recordBind    = "LocalVoiceChatTeam"
+				self.recordEndTime = nil
+				ResetBarForClient(client)
 
-			if team_only ~= true then
-				team_only = true
-				Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = true}, true)
+				if team_only ~= true then
+					team_only = true
+					Client.SendNetworkMessage("LocalTalkExtended_teamonly", {on = true}, true)
+				end
+				Client.VoiceRecordStartEntity(player, Vector.origin)
 			end
-			Client.VoiceRecordStartEntity(player, Vector.origin)
 		end
 	elseif self.recordBind and GetIsBinding(key, self.recordBind) then
 		self.recordBind = nil

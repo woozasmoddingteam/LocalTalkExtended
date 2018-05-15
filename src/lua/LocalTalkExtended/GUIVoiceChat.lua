@@ -25,12 +25,16 @@ local function ResetBarForPlayer(pie)
 	bar.background:SetIsVisible(false)
 end
 
-local function ResetBarForClient(client)
+local function PlayerInfoForClient(client)
 	for _, pie in ientitylist(Shared.GetEntitiesWithClassname "PlayerInfoEntity") do
 		if pie.clientId == client then
-			return ResetBarForPlayer(pie)
+			return pie
 		end
 	end
+end
+
+local function ResetBarForClient(client)
+	return ResetBarForPlayer(PlayerInfoForClient(client))
 end
 
 local function IsRelevant(pie)
@@ -129,7 +133,8 @@ end
 
 local function CanUseLocalVoiceChat(player)
 	return
-		player:GetTeamNumber() ~= kSpectatorIndex or
+		not player:isa "Spectator" or
+		player:isa "TeamSpectator" or
 		not GetGameInfoEntity():GetGameStarted() and player:GetIsFirstPerson()
 end
 
@@ -201,8 +206,8 @@ function GUIVoiceChat:Update(delta_time)
 		self.recordEndTime = nil
 	end
 
-	local local_team   = Client.GetLocalPlayer():GetTeamNumber()
 	local local_client = Client.GetLocalClientIndex()
+	local local_team   = PlayerInfoForClient(local_client).teamNumber
 
 	for i = 1, #chat_bars do
 		local bar = chat_bars[i]

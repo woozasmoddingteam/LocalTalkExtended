@@ -2,29 +2,40 @@
 
 A mod that allows all players to talk to players in their proximity.
 
-# Who can talk?
+There's lots of mods like this on the workshop, although none are as
+complete and as bug-free as this.
 
-Anyone, even spectators, dead players, and commanders.
-Although commanders are quite hard to hear, so you shouldn't expect marines to hear you.
+## Features
 
-# Who can hear me?
+- Team-only proximity/local voice chat
+- Non-team-only proximity/local voice chat
+- Proximity voice chat works spectator, dead player, commander, etc., but with restrictions
+- Static voice chat bar placement, so that the bar of a player does not move around constantly
+- Different color for each voice channel (team-only, non-team-only, global)
+- Customization of proximity/local voice chat colors through NS2+ (bottom of HUD menu)
 
-Depends on which mode you use, there's two key binds after all.
-One allows everyone to hear you, the other is only for your own team.
+## Bugs fixed compared to competitors
+- Spectators not always being able to hear proximity/local voice chat when in first person mode
+- Flickering voice chat bar, due to relevancy issues
 
-# How do I use this?
+# How to use this?
 
-As noted above, there are two key binds.
-You must manually set either or both of these key binds.
+First of all you have to set your keybindings through the vanilla keybinding menu.
+It's at the very bottom of the list, called something like "Proximity Chat".
+Once you've set your keybindings, you can use proximity/local voice chat
+on any server that has this mod enabled.
 
-The key bindings are prefixed with "Proximity Communication" and are
-at the very bottom, so you have to scroll quite a lot!
+If you think the default colors are ugly, you can change them through
+the HUD menu of NS2+ settings, at the very bottom.
 
-# Compared to competitors
+# Voice chat restrictions
 
-Compared to competitors this mod is more compatible with other mods,
-future releases of NS2.
+## Spectators
+Spectators can **only** use local voice chat when the game is not in progress,
+and even then, only when in first person mode!
+This is a technical limitation, although I could work around it, but I'm too lazy.
 
-One big problem of the competitors is that they will break any other mod
-or update to NS2 that adds a key bind. This is quite undesirable, so
-you might want to use this.
+## Commanders
+Commanders can only use team-only local voice chat, and can not hear voice chat
+from enemies that he can not see either (obviously).
+The reason for the team-only restriction is also due to technical limitations.

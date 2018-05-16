@@ -196,6 +196,39 @@ Client.HookNetworkMessage("LocalTalkExtended_teamonly_notify", function(msg)
 	ResetBarForClient(msg.client)
 end)
 
+local function ShouldCreateBar(local_client, client, channel, pie, time)
+	if channel == VoiceChannel.Invalid or pie.voice_chat_bar then
+		return false
+	end
+
+	if channel ~= VoiceChannel.Global and local_client ~= client then
+		-- Reasoning for IsRelevant (local function defined above) call:
+		-- Sadly Spark can not handle VoiceChannel.Entity when the entity referred to is not relevant
+		-- to the client.
+		-- This is understandable though, since the position is a part of the entity, so a fix
+		-- would be an architectural change, something too grand for a small bug like this.
+		if not IsRelevant(pie) then
+			return false
+		end
+
+		-- We need to do this because the team-only network message
+		-- arrives after the voice transmission begins
+		local bar_time = pie.voice_chat_bar_time
+		if not bar_time then
+			pie.voice_chat_bar_time = time + 0.15
+			return false
+		else
+			-- Edge case bug:
+			-- If there are not any bars left, a player not speaking
+			-- will not have their voice_chat_bar_time set to nil
+			-- after they finish speaking
+			return bar_time <= time
+		end
+	end
+
+	return true
+end
+
 function GUIVoiceChat:Update(delta_time)
 	PROFILE("GUIVoiceChat:Update")
 
@@ -236,67 +269,44 @@ function GUIVoiceChat:Update(delta_time)
 		local client  = pie.clientId
 		local channel = GetVoiceChannel(client)
 
-		-- Edge case bug:
-		-- If there are not any bars left, a player not speaking
-		-- will not have their voice_chat_bar_time set to nil
-		--
-		-- Reasoning for IsRelevant (local function defined above) call:
-		-- Sadly Spark can not handle VoiceChannel.Entity when the entity referred to is not relevant
-		-- to the client.
-		-- This is understandable though, since the position is a part of the entity, so a fix
-		-- would be an architectural change, something too grand for a small bug like this.
-		if channel ~= VoiceChannel.Invalid and not pie.voice_chat_bar and IsRelevant(pie) then
-			local create_bar = true
-			if channel ~= VoiceChannel.Global and client ~= local_client then
-				-- We need to do this because the team-only network message
-				-- arrives after the voice transmission begins
-				local bar_time = pie.voice_chat_bar_time
-				if not bar_time then
-					pie.voice_chat_bar_time = time + 0.15
-					create_bar = false
-				else
-					create_bar = bar_time <= time
+		if ShouldCreateBar(local_client, client, channel, pie, time) then
+			local bar
+			for i = 1, #chat_bars do
+				if chat_bars[i].player == Entity.invalidId then
+					bar = chat_bars[i]
+					break
 				end
 			end
-			if create_bar then
-				local bar
-				for i = 1, #chat_bars do
-					if chat_bars[i].player == Entity.invalidId then
-						bar = chat_bars[i]
-						break
-					end
-				end
-				-- All bars may be occupied
-				if bar then
-					local team = pie.teamNumber
+			-- All bars may be occupied
+			if bar then
+				local team = pie.teamNumber
 
-					local color =
-						channel ~= VoiceChannel.Global and (
-							client == local_client and
-								(team_only and kLocalVoiceTeamOnlyFontColor or kLocalVoiceFontColor) or
-							(team == local_team or local_team == kSpectatorIndex) and voice_teamonly[client] and
-								kLocalVoiceTeamOnlyFontColor or
-							kLocalVoiceFontColor
-						) or
-						pie.isCommander and GUIVoiceChat.kCommanderFontColor or
-						team == 1 and GUIVoiceChat.kMarineFontColor or
-						team == 2 and GUIVoiceChat.kAlienFontColor or
-						GUIVoiceChat.kSpectatorFontColor
+				local color =
+					channel ~= VoiceChannel.Global and (
+						client == local_client and
+							(team_only and kLocalVoiceTeamOnlyFontColor or kLocalVoiceFontColor) or
+						(team == local_team or local_team == kSpectatorIndex) and voice_teamonly[client] and
+							kLocalVoiceTeamOnlyFontColor or
+						kLocalVoiceFontColor
+					) or
+					pie.isCommander and GUIVoiceChat.kCommanderFontColor or
+					team == 1 and GUIVoiceChat.kMarineFontColor or
+					team == 2 and GUIVoiceChat.kAlienFontColor or
+					GUIVoiceChat.kSpectatorFontColor
 
-					bar.name:SetText(pie.playerName)
-					bar.name:SetColor(color)
+				bar.name:SetText(pie.playerName)
+				bar.name:SetColor(color)
 
-					bar.icon:SetColor(color)
+				bar.icon:SetColor(color)
 
-					bar.background:SetTexture(team == 2 and kBackgroundTextureAlien or kBackgroundTextureMarine)
-					bar.background:SetColor(team ~= 1 and team ~= 2 and Color(1, 200/255, 150/255, 1) or Color(1, 1, 1, 1))
-					bar.background:SetIsVisible(self.visible)
+				bar.background:SetTexture(team == 2 and kBackgroundTextureAlien or kBackgroundTextureMarine)
+				bar.background:SetColor(team ~= 1 and team ~= 2 and Color(1, 200/255, 150/255, 1) or Color(1, 1, 1, 1))
+				bar.background:SetIsVisible(self.visible)
 
-					pie.voice_chat_bar = bar
-					bar.player = pie:GetId()
+				pie.voice_chat_bar = bar
+				bar.player = pie:GetId()
 
-					pie.voice_channel = channel
-				end
+				pie.voice_channel = channel
 			end
 		end
 	end

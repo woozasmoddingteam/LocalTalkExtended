@@ -118,7 +118,10 @@ function GUIVoiceChat:SetIsVisible(visible)
 	self.visible = visible
 
 	for i = 1, #chat_bars do
-		chat_bars[i].background:SetIsVisible(visible)
+		local bar = chat_bars[i]
+		if bar.player ~= Entity.invalidId then
+			bar.background:SetIsVisible(visible)
+		end
 	end
 end
 

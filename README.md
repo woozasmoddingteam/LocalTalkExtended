@@ -1,3 +1,7 @@
+# Notice to server operators:
+
+This mod now requires Shine's basecommands plugin to be loaded.
+
 # What is this?
 
 A mod that allows all players to talk to players in their proximity.

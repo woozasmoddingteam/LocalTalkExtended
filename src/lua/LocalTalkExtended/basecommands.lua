@@ -1,3 +1,22 @@
+local voice_teamonly = table.array(100)
+local voice_teamonly_for_client = setmetatable({}, {__mode = "kv"})
+
+Server.HookNetworkMessage("LocalTalkExtended_teamonly", function(client, msg)
+	voice_teamonly[client:GetId()] = msg.on
+end)
+
+local kMaxWorldSoundDistanceSquared = debug.getupvaluex(
+	NS2Gamerules.GetCanPlayerHearPlayer, "kMaxWorldSoundDistance")^2
+
+local function GetActualOrigin(ent)
+	local followed = ent:isa "Spectator" and Shared.GetEntity(ent:GetFollowingPlayerId())
+	if followed then
+		return followed:GetOrigin()
+	else
+		return ent:GetOrigin()
+	end
+end
+
 assert(Plugin and Plugin.CanPlayerHearPlayer)
 local old = Plugin.CanPlayerHearPlayer
 local GetOwner

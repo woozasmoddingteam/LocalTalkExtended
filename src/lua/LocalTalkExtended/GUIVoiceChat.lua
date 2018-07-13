@@ -243,7 +243,9 @@ function GUIVoiceChat:Update(delta_time)
 	end
 
 	local local_client = Client.GetLocalClientIndex()
-	local local_team   = PlayerInfoForClient(local_client).teamNumber
+	local player_info = PlayerInfoForClient(local_client)
+	if not player_info then return end
+	local local_team = player_info.teamNumber
 
 	for i = 1, #chat_bars do
 		local bar = chat_bars[i]

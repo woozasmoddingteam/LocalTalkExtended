@@ -1,0 +1,13 @@
+[master]
+name            = "Local Talk Extended"
+tags            = ["must be run on server", "gameplay tweak"]
+description     = "README.md"
+autodescription = true
+website         = "https://github.com/woozasmoddingteam/LocalTalkExtended"
+preview         = "preview.jpg"
+
+[beta]
+name            = "Local Talk Extended - Beta"
+tags            = ["must be run on server", "gameplay tweak", "beta"]
+description_str = "this is a beta - do not use"
+preview         = "preview.jpg"

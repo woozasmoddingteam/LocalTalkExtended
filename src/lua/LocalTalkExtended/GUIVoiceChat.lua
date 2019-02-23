@@ -162,7 +162,7 @@ function GUIVoiceChat:SendKeyEvent(key, down, amount)
 
 			Client.VoiceRecordStartGlobal()
 		elseif CanUseLocalVoiceChat(player) then
-			-- FIXME: Commanders can no talk to enemy players, even if sighted.
+			-- FIXME: Commanders can not talk to enemy players, even if sighted.
 			-- This is quite unfortunate, but unfortunately there is no
 			-- easy way to make enemy players hear them, and attempting
 			-- to remove this check will just result in a voice chat

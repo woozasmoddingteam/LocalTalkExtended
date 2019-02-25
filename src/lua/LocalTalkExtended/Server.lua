@@ -27,7 +27,7 @@ function(gamerules, listener, speaker, channel)
 	end
 
 	if not channel or channel == VoiceChannel.Global then
-		return basecommands:CanPlayerHearGlobalVoice(gamerules, listener, speaker, speaker_client) or false
+		return basecommands:CanPlayerHearGlobalVoice(gamerules, listener, speaker, speaker_client)
 	end
 
 	if

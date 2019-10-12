@@ -8,7 +8,9 @@ end)
 
 if not Shine then
 	Shared.Message "\n\nPlease install Shine Administration to use Local Talk Extended\n\n"
+    return
 end
+
 Shine.Hook.Add("CanPlayerHearPlayer", "LocalTalkExtended",
 function(gamerules, listener, speaker, channel)
 	-- Also avoids sending teamonly_notify network message!

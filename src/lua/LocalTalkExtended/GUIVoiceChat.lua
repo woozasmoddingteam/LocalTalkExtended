@@ -3,8 +3,8 @@ debug.getupvaluex(Script.Load, "fileHooks").post["lua/GUIVoiceChat.lua"] = nil
 
 class 'GUIVoiceChat' (GUIScript)
 
-kLocalVoiceFontColor         = kLocalVoiceFontColor         or Color(0.50, 1.00, 0.50, 1)
-kLocalVoiceTeamOnlyFontColor = kLocalVoiceTeamOnlyFontColor or Color(0.75, 0.15, 0.75, 1)
+kLocalVoiceFontColor         = Client.GetOptionColor("LocalTalkExtended_color", 0x80FF80)
+kLocalVoiceTeamOnlyFontColor = Client.GetOptionColor("LocalTalkExtended_color_team",  0xC028C0)
 
 GUIVoiceChat.kCommanderFontColor = Color(1, 1, 0, 1)
 GUIVoiceChat.kMarineFontColor    = Color(147/255, 206/255, 1, 1)

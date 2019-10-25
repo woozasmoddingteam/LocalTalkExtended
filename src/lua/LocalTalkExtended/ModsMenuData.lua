@@ -4,10 +4,10 @@ OP_TT_ColorPicker = OP_TT_ColorPicker or GetMultiWrappedClass(GUIMenuColorPicker
 
 local menu =
 {
-    categoryName = "ns2Plus",
+    categoryName = "localTalk",
     entryConfig =
     {
-        name = "ns2PlusModEntry",
+        name = "localTalkModEntry",
         class = GUIMenuCategoryDisplayBoxEntry,
         params =
         {
@@ -16,7 +16,7 @@ local menu =
     },
     contentsConfig = ModsMenuUtils.CreateBasicModsMenuContents
     {
-        layoutName = "ns2PlusOptions",
+        layoutName = "localTalkOptions",
         contents =
         {
             {

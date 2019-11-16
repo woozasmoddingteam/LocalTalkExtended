@@ -8,7 +8,7 @@ end)
 
 if not Shine then
 	Shared.Message "\n\nPlease install Shine Administration to use Local Talk Extended\n\n"
-    return
+	return
 end
 
 Shine.Hook.Add("CanPlayerHearPlayer", "LocalTalkExtended",

@@ -319,3 +319,6 @@ function GUIVoiceChat:Update(delta_time)
 		end
 	end
 end
+
+-- Is this correct? No idea, but I can't test the game to fix it properly
+function GUIVoiceChat:Reload() end

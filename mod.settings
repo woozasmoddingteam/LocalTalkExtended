@@ -1,15 +1,21 @@
-# Notice to server operators
+name        = "Meteru's Local Talk Extended Fork"
+source_dir  = "source"
+output_dir  = "src"
+description = [=[
+Mod ID: 8B09F28C
+
+Notice to server operators:
 
 This mod now requires Shine's basecommands plugin to be loaded.
 
-# What is this?
+What is this?
 
 A mod that allows all players to talk to players in their proximity.
 
 There's lots of mods like this on the workshop, although none are as
 complete and as bug-free as this.
 
-## Features
+Features
 
 - Team-only proximity/local voice chat
 - Non-team-only proximity/local voice chat
@@ -18,21 +24,25 @@ complete and as bug-free as this.
 - Different color for each voice channel (team-only, non-team-only, global)
 - Customization of proximity/local voice chat colors through NS2+ (bottom of HUD menu)
 
-## Bugs fixed compared to competitors
+Bugs fixed compared to competitors
 - Spectators not being always able to hear proximity/local voice chat when in first person mode
 
-# How to use this?
+How to use this?
 
 First you have to set your keybindings in Options -> Mods -> Local Talk Extended.
 Once you've set your keybindings, you can use proximity/local voice chat
 on any server that has this mod enabled.
 
-# Voice chat restrictions
+Voice chat restrictions
 
-## Spectators
+Spectators
 Spectators can not use local voice.
 
-## Commanders
+Commanders
 Commanders can only use team-only local voice chat, and can not hear voice chat
 from enemies that he can not see either (obviously).
-The reason for the team-only restriction is due to technical limitations.
+The reason for the team-only restriction is due to technical limitations.]=]
+image       = "preview.jpg"
+tag_modtype = "Gameplay Tweak"
+tag_support = "Must be run on Server"
+publish_id = "8b09f28c"

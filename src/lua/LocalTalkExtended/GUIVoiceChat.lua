@@ -1,6 +1,3 @@
--- Disable post hooks
-debug.getupvaluex(Script.Load, "fileHooks").post["lua/GUIVoiceChat.lua"] = nil
-
 class 'GUIVoiceChat' (GUIScript)
 
 kLocalVoiceFontColor         = Client.GetOptionColor("LocalTalkExtended_color", 0x80FF80)

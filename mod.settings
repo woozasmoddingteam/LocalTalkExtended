@@ -1,8 +1,8 @@
-name        = "Meteru's Local Talk Extended Fork"
+name        = "Local Talk"
 source_dir  = "source"
 output_dir  = "src"
 description = [=[
-Mod ID: 8B09F28C
+Mod ID: 2332684940
 
 Notice to server operators:
 
@@ -45,4 +45,4 @@ The reason for the team-only restriction is due to technical limitations.]=]
 image       = "preview.jpg"
 tag_modtype = "Gameplay Tweak"
 tag_support = "Must be run on Server"
-publish_id = "8b09f28c"
+publish_id = 2332684940
